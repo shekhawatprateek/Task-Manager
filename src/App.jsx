@@ -6,9 +6,21 @@ function App() {
   const [taskInput, setTaskInput] = useState("");
   const [taskList, setTaskList] = useState([]);
   const [filter, setFilter] = useState("all");
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+    console.log("Theme toggled:", newTheme);
+  };
+
+  useEffect(() => {
+    document.body.setAttribute("data-theme", theme);
+    console.log("Theme applied:", theme);
+  }, [theme]);
 
   function handleInput(value) {
-    console.log("value", value)
     setTaskInput(value);
   }
 
@@ -22,11 +34,7 @@ function App() {
     const existingTasks = JSON.parse(localStorage.getItem("tasks")) || [];
     const updatedTasks = [...existingTasks, newTask];
 
-    console.log("<><><> line 24", existingTasks, updatedTasks)
-
     localStorage.setItem("tasks", JSON.stringify(updatedTasks));
-
-
     setTaskList(updatedTasks);
     setTaskInput("");
 
@@ -39,6 +47,8 @@ function App() {
       draggable: true,
       theme: "dark",
     });
+
+    console.log("Task added:", newTask);
   }
 
   const deleteTask = (taskId) => {
@@ -55,6 +65,8 @@ function App() {
       draggable: true,
       theme: "dark",
     });
+
+    console.log("Task deleted, ID:", taskId);
   };
 
   const completeTask = (taskId) => {
@@ -77,12 +89,15 @@ function App() {
       draggable: true,
       theme: "dark",
     });
+
+    console.log("Task completed, ID:", taskId);
   };
 
   useEffect(() => {
     function getTaskList() {
       const task_list = JSON.parse(localStorage.getItem("tasks")) || [];
       setTaskList(task_list);
+      console.log("Task list loaded from localStorage:", task_list);
     }
 
     getTaskList();
@@ -93,8 +108,6 @@ function App() {
     if (filter === "pending") return task.status === "pending";
     return true;
   });
-
-  console.log("<><><", filteredTasks)
 
   return (
     <>
@@ -107,7 +120,7 @@ function App() {
           value={taskInput}
           onChange={(e) => handleInput(e.target.value)}
         />
-        <button disabled={!taskInput} onClick={addTask}>
+        <button style={{color: "#fff"}} disabled={!taskInput} onClick={addTask}>
           Add Task
         </button>
         <ToastContainer />
@@ -131,6 +144,12 @@ function App() {
           onClick={() => setFilter("pending")}
         >
           Pending
+        </button>
+      </div>
+
+      <div className="theme-toggle">
+        <button onClick={toggleTheme}>
+          Switch to {theme === "light" ? "Dark" : "Light"} Mode
         </button>
       </div>
 
